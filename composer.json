@@ -2,8 +2,7 @@
   "name": "shiftness/backend",
   "description": "Shiftness PHP Backend API",
   "require": {
-    "php": "^7.4",
-    "vlucas/phpdotenv": "^5.4"
+    "php": "^8.1"
   },
   "autoload": {
     "psr-4": {
