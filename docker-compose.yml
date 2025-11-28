@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: shiftness_db
+    environment:
+      POSTGRES_DB: shiftness_db
+      POSTGRES_USER: shiftness_db_user
+      POSTGRES_PASSWORD: mX10R716zy0oPItryL8w2pj2lix7Z9r6
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - shiftness_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shiftness_db_user -d shiftness_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PHP Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shiftness_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: shiftness_db
+      DB_USER: shiftness_db_user
+      DB_PASSWORD: mX10R716zy0oPItryL8w2pj2lix7Z9r6
+    networks:
+      - shiftness_network
+
+volumes:
+  postgres_data:
+
+networks:
+  shiftness_network:
+    driver: bridge

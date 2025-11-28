@@ -1,0 +1,10 @@
+.env.local
+.env.*.local
+vendor/
+.DS_Store
+*.log
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
