@@ -41,7 +41,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 try {
-    $query = "SELECT id, email, role, created_at FROM users WHERE id = :id";
+    $query = "SELECT id, email, role, share_code, created_at FROM users WHERE id = :id";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':id', $decoded['user_id']);
     $stmt->execute();
@@ -62,6 +62,7 @@ try {
             'id' => $user['id'],
             'email' => $user['email'],
             'role' => $user['role'],
+            'share_code' => $user['share_code'],
             'created_at' => $user['created_at']
         ]
     ]);

@@ -36,7 +36,7 @@ $db = $database->getConnection();
 
 try {
     // Find user by email
-    $query = "SELECT id, email, password, created_at FROM users WHERE email = :email";
+    $query = "SELECT id, email, password, role, share_code, created_at FROM users WHERE email = :email";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':email', $email);
     $stmt->execute();
@@ -60,7 +60,7 @@ try {
     $rememberMe = isset($data['remember_me']) && $data['remember_me'] === true;
     
     // Generate token (30 days if remember me, otherwise 7 days)
-    $token = generateToken($user['id'], $user['email'], $rememberMe);
+    $token = generateToken($user['id'], $user['email'], $user['role'], $rememberMe);
 
     // Return success response
     http_response_code(200);
@@ -71,6 +71,8 @@ try {
         'user' => [
             'id' => $user['id'],
             'email' => $user['email'],
+            'role' => $user['role'],
+            'share_code' => $user['share_code'],
             'created_at' => $user['created_at']
         ]
     ]);

@@ -3,7 +3,7 @@
 define('JWT_SECRET', 'your-secret-key-change-this-in-production-12345');
 
 // Generate a simple token (for production, use a proper JWT library like firebase/php-jwt)
-function generateToken($userId, $email, $rememberMe = false) {
+function generateToken($userId, $email, $role = 'user', $rememberMe = false) {
     // 30 days if remember me, otherwise 7 days
     $expirationDays = $rememberMe ? 30 : 7;
     
@@ -11,6 +11,7 @@ function generateToken($userId, $email, $rememberMe = false) {
     $payload = base64_encode(json_encode([
         'user_id' => $userId,
         'email' => $email,
+        'role' => $role,
         'iat' => time(),
         'exp' => time() + ($expirationDays * 24 * 60 * 60)
     ]));
