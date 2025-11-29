@@ -1,4 +1,9 @@
 <?php
+// Error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 // Secret key for token generation (change this to a secure random string in production)
 define('JWT_SECRET', 'your-secret-key-change-this-in-production-12345');
 

@@ -1,4 +1,5 @@
 <?php
+require_once '../utils/errors.php';
 require_once '../utils/cors.php';
 require_once '../config/database.php';
 require_once '../utils/auth.php';
@@ -132,9 +133,23 @@ try {
     ]);
 
 } catch(PDOException $e) {
-    error_log("Database error: " . $e->getMessage());
+    error_log("Database error in add_user_to_business: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Failed to add user to business. Please try again later.']);
+    $errorMessage = 'Failed to add user to business. Please try again later.';
+    if (ini_get('display_errors')) {
+        $errorMessage .= ' Error: ' . $e->getMessage();
+    }
+    echo json_encode(['success' => false, 'message' => $errorMessage]);
+} catch(Exception $e) {
+    error_log("General error in add_user_to_business: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
+    http_response_code(500);
+    $errorMessage = 'Failed to add user to business. Please try again later.';
+    if (ini_get('display_errors')) {
+        $errorMessage .= ' Error: ' . $e->getMessage();
+    }
+    echo json_encode(['success' => false, 'message' => $errorMessage]);
 }
 ?>
 

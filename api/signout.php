@@ -1,4 +1,5 @@
 <?php
+require_once '../utils/errors.php';
 require_once '../utils/cors.php';
 
 // Sign out is handled on the client side by removing the token
