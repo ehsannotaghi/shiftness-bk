@@ -9,9 +9,28 @@ function isAdmin($token) {
         return false;
     }
     
-    // Check if role is admin (from token or database)
+    // Check if role is admin (from token)
     if (isset($decoded['role']) && $decoded['role'] === 'admin') {
         return true;
+    }
+    
+    // Also check database to be sure
+    try {
+        require_once '../config/database.php';
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "SELECT role FROM users WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $decoded['user_id']);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() > 0) {
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user['role'] === 'admin';
+        }
+    } catch (Exception $e) {
+        error_log("Error checking admin status: " . $e->getMessage());
     }
     
     return false;
