@@ -56,8 +56,11 @@ try {
         exit;
     }
 
-    // Generate token
-    $token = generateToken($user['id'], $user['email']);
+    // Check if remember me is requested
+    $rememberMe = isset($data['remember_me']) && $data['remember_me'] === true;
+    
+    // Generate token (30 days if remember me, otherwise 7 days)
+    $token = generateToken($user['id'], $user['email'], $rememberMe);
 
     // Return success response
     http_response_code(200);

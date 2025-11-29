@@ -3,13 +3,16 @@
 define('JWT_SECRET', 'your-secret-key-change-this-in-production-12345');
 
 // Generate a simple token (for production, use a proper JWT library like firebase/php-jwt)
-function generateToken($userId, $email) {
+function generateToken($userId, $email, $rememberMe = false) {
+    // 30 days if remember me, otherwise 7 days
+    $expirationDays = $rememberMe ? 30 : 7;
+    
     $header = base64_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
     $payload = base64_encode(json_encode([
         'user_id' => $userId,
         'email' => $email,
         'iat' => time(),
-        'exp' => time() + (7 * 24 * 60 * 60) // 7 days
+        'exp' => time() + ($expirationDays * 24 * 60 * 60)
     ]));
     
     $signature = hash_hmac('sha256', "$header.$payload", JWT_SECRET, true);
