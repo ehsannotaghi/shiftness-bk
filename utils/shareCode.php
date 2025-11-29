@@ -13,14 +13,24 @@ function generateShareCode($db) {
         }
         
         // Check if code already exists in database
-        $checkQuery = "SELECT id FROM users WHERE share_code = :code LIMIT 1";
-        $checkStmt = $db->prepare($checkQuery);
-        $checkStmt->bindParam(':code', $code, PDO::PARAM_STR);
-        $checkStmt->execute();
-        
-        // If code doesn't exist, it's unique
-        if ($checkStmt->rowCount() === 0) {
-            return $code;
+        try {
+            $checkQuery = "SELECT id FROM users WHERE share_code = :code LIMIT 1";
+            $checkStmt = $db->prepare($checkQuery);
+            $checkStmt->bindParam(':code', $code, PDO::PARAM_STR);
+            $checkStmt->execute();
+            
+            // If code doesn't exist, it's unique
+            if ($checkStmt->rowCount() === 0) {
+                return $code;
+            }
+        } catch (PDOException $e) {
+            // Check if error is because column doesn't exist
+            if (strpos($e->getMessage(), 'column') !== false && strpos($e->getMessage(), 'does not exist') !== false) {
+                throw new Exception("share_code column does not exist in database. Please run the migration SQL first.");
+            }
+            // Other database errors - log and continue checking
+            error_log("Database error checking share code: " . $e->getMessage());
+            // Continue trying to generate a new code
         }
         
         $attempt++;

@@ -69,10 +69,25 @@ try {
             break; // Successfully generated unique code
         } catch (Exception $e) {
             $codeGenerationAttempts++;
-            if ($codeGenerationAttempts >= $maxCodeGenerationAttempts) {
-                error_log("Failed to generate unique share code: " . $e->getMessage());
+            $errorMessage = $e->getMessage();
+            error_log("Share code generation attempt {$codeGenerationAttempts} failed: " . $errorMessage);
+            
+            // Check if it's a column missing error
+            if (strpos($errorMessage, 'column') !== false && strpos($errorMessage, 'does not exist') !== false) {
                 http_response_code(500);
-                echo json_encode(['success' => false, 'message' => 'Failed to generate share code. Please try again.']);
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'Database configuration error: share_code column is missing. Please run the database migration SQL first.'
+                ]);
+                exit;
+            }
+            
+            if ($codeGenerationAttempts >= $maxCodeGenerationAttempts) {
+                http_response_code(500);
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'Failed to generate unique share code after multiple attempts. Please try again or contact support.'
+                ]);
                 exit;
             }
             // Wait a bit before retrying (microseconds)
